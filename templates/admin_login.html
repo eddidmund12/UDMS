@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="login-page">
+    <header class="main-header">
+        <h1>Admin Login</h1>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <script>
+            setTimeout(() => {
+                document.querySelectorAll('.flash-message').forEach(el => el.style.display = 'none');
+            }, 3000);
+        </script>
+    <form method="POST" action="{{ url_for('admin.admin_logon') }}">
+        <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" placeholder=" " >
+        </div>
+        <div class="input-group">
+            <div class="login-page-password-wrapper">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder=" ">
+                <span class="login-page-toggle-password" onclick="togglePassword('password', this)">
+                    <svg id="eye-icon-password" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </span>
+            </div>
+        </div>
+        <button type="submit">Login</button>
+        <div style="text-align:center;margin-top:10px;font-size:0.98rem;">
+            Don't have an account? <a href="{{ url_for('admin.admin_signup') }}" style="color:#007bff;text-decoration:underline;">Sign Up</a>
+        </div>
+    </form>
+
+<script>
+function togglePassword(inputId, el) {
+    const input = document.getElementById(inputId);
+    const svg = el.querySelector('svg');
+    if (input.type === 'password') {
+        input.type = 'text';
+        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m3.249-2.568A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.965 9.965 0 01-4.293 5.032M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"/>';
+    } else {
+        input.type = 'password';
+        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <script>
+            setTimeout(() => {
+                document.querySelectorAll('.flash-message').forEach(el => el.style.display = 'none');
+            }, 3000);
+        </script>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('admin.admin_manage_users') }}"><i class="fas fa-users"></i> Manage Users</a></li>
+                <li><a href="{{ url_for('admin.admin_edit_user', user_id=session['user_id']) }}"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                <li><a href="{{ url_for('admin.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-left">
+                    <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+                    <p>Welcome back, {{ session['name'] }}!</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <img src="{{ url_for('admin.admin_passport', admin_id=session['user_id']) }}" alt="Profile" class="header-avatar" />
+                        <span>{{ session['name'] }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-container">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                <i class="fas fa-info-circle"></i> {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-grid">
+                <!-- Profile Card -->
+                <div class="card profile-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user"></i> Profile Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="profile-avatar">
+                            <img src="{{ url_for('admin.admin_passport', admin_id=session['user_id']) }}" alt="Your Passport" />
+                        </div>
+                        <h4>{{ session['name'] }}</h4>
+                        <p>Administrator</p>
+                        <div class="profile-actions">
+                            <a href="{{ url_for('admin.admin_edit_user', user_id=session['user_id']) }}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> Total Users</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-number">{{ user_count }}</div>
+                        <p>Registered users</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card quick-actions-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="action-buttons">
+                            <a href="{{ url_for('admin.admin_manage_users') }}" class="btn btn-primary">
+                                <i class="fas fa-users"></i> Manage Users
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i>Logout</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout?</p>
+                <p class="warning-text"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn btn-danger">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Admin Dashboard. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-privacy"></i> Privacy Policy</a>
+                <a href="#"><i class="fas fa-terms"></i> Terms of Service</a>
+                <a href="#"><i class="fas fa-support"></i> Support</a>
+            </div>
+        </div>
+    </footer>
+  
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    
+</body>
+</html>

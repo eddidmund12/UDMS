@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="welcome-message">Welcome  {{ user[1] }} {{ user[3] }}</div>
+            <a href="{{ url_for('user.logout') }}" class="logout-btn">Logout</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <script>
+            setTimeout(() => {
+                document.querySelectorAll('.flash-message').forEach(el => el.style.display = 'none');
+            }, 3000);
+        </script>
+
+        <div class="dashboard-content">
+            <div class="profile-card">
+                {% if user[7] %}
+                    <img src="{{ url_for('user.user_passport', user_id=user[0]) }}" alt="Profile Picture" class="profile-picture">
+                {% else %}
+                    <div class="profile-picture" style="background-color: #ccc; display: flex; align-items: center; justify-content: center; font-size: 48px; color: #666;">{{ user[1][0] }}{{ user[3][0] }}</div>
+                {% endif %}
+                <div class="profile-name">{{ user[1] }} {{ user[3] }}</div>
+                <div class="profile-actions">
+                    <a href="{{ url_for('user.edit_user', user_id=user[0]) }}" class="btn btn-primary">Edit Profile</a>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>Personal Information</h2>
+                <div class="info-item">
+                    <span class="info-label">First Name:</span>
+                    <span class="info-value">{{ user[1] }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Middle Name:</span>
+                    <span class="info-value">{{ user[2] or 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Last Name:</span>
+                    <span class="info-value">{{ user[3] }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Sex:</span>
+                    <span class="info-value">{{ user[4] }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date of Birth:</span>
+                    <span class="info-value">{{ user[5] }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ user[6] }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

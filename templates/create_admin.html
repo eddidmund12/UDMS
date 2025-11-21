@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Create Admin</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('superadmin.superadmin_create_admin') }}">
+        <label for="firstname">First Name:</label>
+        <input type="text" name="firstname" id="firstname" required><br>
+        <label for="middlename">Middle Name:</label>
+        <input type="text" name="middlename" id="middlename"><br>
+        <label for="lastname">Last Name:</label>
+        <input type="text" name="lastname" id="lastname" required><br>
+        <label for="sex">Sex:</label>
+        <select name="sex" id="sex" required>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+        </select><br>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" name="dob" id="dob" required><br>
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required><br>
+        <label for="img">Passport:</label>
+        <input type="file" name="image" accept="image/*" required><br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required><br>
+        <label for="c-password">Confirm Password:</label>
+        <input type="password" name="c-password" id="c-password" required><br>
+        <input type="hidden" name="role" value="admin">
+        <button type="submit" value="Upload">Create Admin</button>
+    </form>
+    <p><a href="{{ url_for('superadmin.superadmin_dashboard') }}">Back to Dashboard</a></p>
+</body>
+</html>

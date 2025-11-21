@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <a href="{{ url_for('superadmin.superadmin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <!-- <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a> -->
+        </nav>
+        <h1>Admin Logs</h1>
+    </header>
+
+    <div class="logs-container">
+        {% if logs %}
+        <div class="search-container" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <input type="text" id="searchInput" placeholder="Search by email or action..." style="width: 70%;  border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+            
+        </div>
+        <table class="logs-table" id="logsTable">
+            <form method="post" action="{{ url_for('superadmin.clear_admin_logs') }}" style="margin: 0;">
+                <button type="submit" style="padding: 10px 20px; width: 10%; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;" onclick="return confirm('Are you sure you want to clear all admin logs?')">Clear Logs</button>
+            </form>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Admin Email</th>
+                    <th>Action</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log[0] }}</td>
+                    <td>{{ log[1] }}</td>
+                    <td>{{ log[2] }}</td>
+                    <td>{{ log[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No admin logs found.</p>
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

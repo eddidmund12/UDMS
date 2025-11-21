@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="main-header">
+        <h1>Edit Profile</h1>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form class="signup-container" method="POST" action="{{ url_for('user.edit_user', user_id=user[0]) }}">
+        <div class="input-group">
+            <label for="firstname">First Name:</label>
+            <input type="text" name="firstname" id="firstname" value="{{ user[1] }}" required>
+        </div>
+        <div class="input-group">
+            <label for="middlename">Middle Name:</label>
+            <input type="text" name="middlename" id="middlename" value="{{ user[2] or '' }}">
+        </div>
+        <div class="input-group">
+            <label for="lastname">Last Name:</label>
+            <input type="text" name="lastname" id="lastname" value="{{ user[3] }}" required>
+        </div>
+        <div class="input-group">
+            <label for="sex">Sex:</label>
+            <select name="sex" id="sex" required>
+                <option value="M" {% if user[4] == 'M' %}selected{% endif %}>Male</option>
+                <option value="F" {% if user[4] == 'F' %}selected{% endif %}>Female</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="dob">Date of Birth:</label>
+            <input type="date" name="dob" id="dob" value="{{ user[5] }}" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+    <p><a href="{{ url_for('user.home', user_id=user[0]) }}" class="btn btn-secondary">Back to Home</a></p>
+    <script src="{{ url_for('static', filename='js/script.js')}}"></script>
+</body>
+</html>

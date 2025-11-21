@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="main-header"><h1>Edit User</h1></div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <script>
+            setTimeout(() => {
+                document.querySelectorAll('.flash-message').forEach(el => el.style.display = 'none');
+            }, 3000);
+        </script>
+    <form method="POST" action="{{ url_for('admin.admin_edit_user', user_id=user[0]) }}" class="edit-user-form">
+        <div>
+            <label for="firstname">First Name:</label>
+            <input type="text" name="firstname" id="firstname" value="{{ user[1] }}">
+        </div>
+        <div>
+            <label for="middlename">Middle Name:</label>
+            <input type="text" name="middlename" id="middlename" value="{{ user[2] or '' }}">
+        </div>
+        <div>
+            <label for="lastname">Last Name:</label>
+            <input type="text" name="lastname" id="lastname" value="{{ user[3] }}">
+        </div>
+        <div>
+            <label for="sex">Sex:</label>
+            <select name="sex" id="sex">
+                <option value="M" {% if user[4] == 'M' %}selected{% endif %}>Male</option>
+                <option value="F" {% if user[4] == 'F' %}selected{% endif %}>Female</option>
+            </select>
+        </div>
+        <div>
+            <label for="dob">Date of Birth:</label>
+            <input type="date" name="dob" id="dob" value="{{ user[5] }}">
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" value="{{ user[6] }}">
+        </div>
+        
+        <div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+    <p><a href="{{ url_for('admin.admin_manage_users') }}" class="link-primary">Back to Manage Users</a></p>
+    
+    <script src="{{url_for('static', filename='js/script.js')}}"></script>
+</body>
+</html>

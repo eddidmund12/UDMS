@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Email verification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+    <header class="main-header">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              m<h1>Verify Email</h1>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form method="POST" action="{{ url_for('user.verify_otp') }}">
+        <div class="input-group">
+            <label for="otp">Enter the 6-digits OTP sent to your mail:</label><br>
+            <input type="text" id="otp" name="otp" maxlength="6" required /><br>
+        </div>
+        <button type="submit">Verify</button>
+        <div>
+            <a href="javascript:void(0);" id="resendOtp" onclick="resendOtp()" style="float: inline-end;">Resend OTP</a>
+                <span id="countdown"></span>
+        </div>
+    </form>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

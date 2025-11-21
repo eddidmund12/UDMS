@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Sign Up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">Create Your Account</div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="flash-message {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('user.user_input') }}">
+            <div class="input-group">
+                <label for="firstname">First Name</label>
+                <input type="text" name="firstname" id="firstname" required />
+            </div>
+            <div class="input-group">
+                <label for="lastname">Last Name</label>
+                <input type="text" name="lastname" id="lastname" required />
+            </div>
+            <div class="input-group">
+                <label for="middlename">Middle Name (optional)</label>
+                <input type="text" name="middlename" id="middlename" />
+            </div>
+            <div class="input-group">
+                <label for="sex">Sex</label>
+                <select name="sex" id="sex" required>
+                    <option value="" disabled selected>Select your sex</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" name="dob" id="dob" required />
+                <div id="ageError" class="error"></div>
+            </div>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" required />
+            </div>
+            <div class="input-group">
+                <label for="image">Profile Image</label>
+                <input type="file" name="image" id="image" accept="image/*" required />
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="Enter password" required pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$" oninput="validatePassword(this)" />
+                <div id="password-feedback" class="error" style="display:none;">
+                    Password cannot be less than six characters.<br />
+                    Must contain letters and numbers.
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="c-password">Confirm Password</label>
+                <input type="password" name="c-password" id="c-password" placeholder="Confirm password" required oninput="validateConfirmPassword()" />
+                <div id="confirm-feedback" class="error" style="display:none;">Passwords do not match.</div>
+            </div>
+            <button type="submit" value="Upload">Sign Up</button>
+            <div class="login-link">
+                Already have an account? <a href="{{ url_for('user.user_logon') }}">Login</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superadmin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <a href="{{ url_for('superadmin.superadmin_create_admin') }}"><i class="fas fa-user-plus"></i> Create Admin</a>
+            <a href="{{ url_for('superadmin.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+        <h1><i class="fas fa-tachometer-alt"></i> Superadmin Dashboard</h1>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+<script>
+            setTimeout(() => {
+                document.querySelectorAll('.flash-message').forEach(el => el.style.display = 'none');
+            }, 3000);
+        </script>
+    <div class="superadmin-dashboard">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ users|length }}</h3>
+                    <p>Total Users</p>
+                </div>
+            </div>
+
+            <div class="stat-card animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="daily-users">{{ daily_users }}</h3>
+                    <p>Users (Last 24h)</p>
+                </div>
+            </div>
+
+            <div class="stat-card animate-fade-in" style="animation-delay: 0.3s;">
+                <div class="stat-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ approved_admins|length }}</h3>
+                    <p>Approved Admins</p>
+                </div>
+            </div>
+
+            <div class="stat-card animate-fade-in" style="animation-delay: 0.4s;">
+                <div class="stat-icon">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ pending_admins|length }}</h3>
+                    <p>Pending Admins</p>
+                </div>
+            </div>
+
+            <div class="stat-card animate-fade-in" style="animation-delay: 0.5s;">
+                <div class="stat-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ superadmins|length }}</h3>
+                    <p>Superadmins</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="actions-section animate-slide-up">
+            <h2>Quick Actions</h2>
+            <div class="actions-grid">
+                <a href="{{ url_for('superadmin.manage_users') }}" class="action-card">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="{{ url_for('superadmin.manage_pending_admins') }}" class="action-card">
+                    <i class="fas fa-user-check"></i>
+                    <span>Pending Admins</span>
+                </a>
+                <a href="{{ url_for('superadmin.manage_admins') }}" class="action-card">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Manage Admins</span>
+                </a>
+                <a href="{{ url_for('superadmin.superadmin_create_admin') }}" class="action-card">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Create Admin</span>
+                </a>
+                <a href="{{ url_for('superadmin.user_logs') }}" class="action-card">
+                    <i class="fas fa-history"></i>
+                    <span>User Logs</span>
+                </a>
+                <a href="{{ url_for('superadmin.admin_logs') }}" class="action-card">
+                    <i class="fas fa-history"></i>
+                    <span>Admin Logs</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Animate numbers
+        function animateNumber(element, target) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current);
+            }, 30);
+        }
+
+        // Start animations when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const dailyUsersElement = document.getElementById('daily-users');
+            const target = parseInt(dailyUsersElement.textContent);
+            animateNumber(dailyUsersElement, target);
+        });
+    </script>
+</body>
+</html>
