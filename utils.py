@@ -197,5 +197,54 @@ def log_admin_activity(admin_id, email, action):
 
 
 
-    
+from werkzeug.security import generate_password_hash
+
+def create_default_superadmin():
+    conn = sqlite3.connect("superadmins.db")
+    cursor = conn.cursor()
+
+    # Ensure table exists
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS superadmins(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            first_name TEXT NOT NULL,
+            middle_name TEXT,
+            last_name TEXT NOT NULL,
+            sex TEXT NOT NULL,
+            dob TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            passport BLOB,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'superadmin'
+        )
+    """)
+
+    # Check if a superadmin already exists
+    cursor.execute("SELECT COUNT(*) FROM superadmins")
+    exists = cursor.fetchone()[0]
+
+    if exists == 0:
+        hashed_password = generate_password_hash("Administrator")
+
+        cursor.execute("""
+            INSERT INTO superadmins
+            (first_name, middle_name, last_name, sex, dob, email, passport, password, role)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            "Edmund",
+            "Eniola",
+            "Adeyi",
+            "Male",
+            "2007-06-26",
+            "eddiedmund123@gmail.com",
+            None,
+            hashed_password,
+            "superadmin"
+        ))
+
+        conn.commit()
+        print("✅ Superadmin auto-created")
+
+    conn.close()
+
             
