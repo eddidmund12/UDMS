@@ -16,3 +16,4 @@ python-api/
 
 # OS
 .DS_Store
+local.db

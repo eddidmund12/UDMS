@@ -1,15 +1,24 @@
-# app.py
 import os
 from flask import Flask, session, flash, redirect, url_for, render_template
 from flask_mail import Mail
-from utils import init_db, init_logs_db,create_default_superadmin
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# 🔐 Security (Render Environment Variables)
+# 🔐 Security
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
 
-# 📧 Flask-Mail configuration (Render-safe)
+# 🐘 Database (PostgreSQL on Render, SQLite locally)
+database_url = os.environ.get("DATABASE_URL")
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///local.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+# 📧 Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -19,7 +28,10 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get("MAIL_USERNAME")
 
 mail = Mail(app)
 
-# 🔗 Import blueprints AFTER mail init
+# 🔗 Import models & utils AFTER db init
+from utils import create_default_superadmin
+
+# 🔗 Blueprints
 from users_rt import user_bp
 from admin_rt import admin_bp
 from superadmin_rt import superadmin_bp
@@ -47,7 +59,7 @@ def data():
 def dashboard():
     return render_template("dashboard.html")
 
-# ✅ INIT DATABASES (Render-safe)
-init_db()
-init_logs_db()
-create_default_superadmin()
+# ✅ Create tables & default superadmin
+with app.app_context():
+    db.create_all()
+    create_default_superadmin()
