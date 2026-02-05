@@ -47,7 +47,7 @@ class SuperAdmin(db.Model):
     sex = db.Column(db.String(10), nullable=False)
     dob = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
-    passport = db.Column(db.LargeBinary)
+    passport = db.Column(db.LargeBinary, nullable=True)  # now nullable
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), default="superadmin")
 
@@ -110,9 +110,17 @@ def role_required(required_role):
 def process_image(file):
     if not file or file.filename == '':
         raise ValueError("No image selected")
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+    if not '.' in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+        raise ValueError('Invalid image format')
     image_data = file.read()
-    img = Image.open(io.BytesIO(image_data))
-    img.verify()
+    if len(image_data) > 5 * 1024 * 1024:
+        raise ValueError('File size too large. Max 5MB.')
+    try:
+        img = Image.open(io.BytesIO(image_data))
+        img.verify()
+    except Exception:
+        raise ValueError('Invalid image file')
     return image_data
 
 def generate_otp():
@@ -120,7 +128,7 @@ def generate_otp():
 
 def send_otp_email(email, otp, mail):
     msg = Message("Your OTP Code", recipients=[email])
-    msg.body = f"Your OTP code is {otp}"
+    msg.body = f"Your OTP code is {otp}. It expires in 10 minutes."
     mail.send(msg)
 
 def log_user_activity(user_id, email, action):
@@ -140,7 +148,8 @@ def create_default_superadmin():
             sex="Male",
             dob=date(2007, 6, 26),
             email="eddiedmund123@gmail.com",
-            password=generate_password_hash("Administrator")
+            password=generate_password_hash("Administrator"),
+            passport=None  # safe for Render
         )
         db.session.add(sa)
         db.session.commit()
