@@ -1,54 +1,68 @@
-from flask import Blueprint, render_template, request, redirect, flash, url_for, session, send_file, jsonify
-import io, os, tempfile, time
-from db import db
-from models import User, UserLog
-from utils import data_validation, role_required, hash_password, check_password, process_image, generate_otp, send_otp_email
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from werkzeug.security import generate_password_hash, check_password_hash
+from db import users_col
+import cloudinary.uploader
+import uuid
+from datetime import datetime
 
-user_bp = Blueprint('user', __name__)
+users_bp = Blueprint("users", __name__)
 
-@user_bp.route('/')
-def homePage():
-    return render_template("welcome.html")
-
-
-@user_bp.route('/login', methods=["GET", "POST"])
-def user_logon():
+@users_bp.route("/signup", methods=["GET", "POST"])
+def signup():
     if request.method == "POST":
         email = request.form["email"]
-        password = request.form["password"]
 
-        user = User.query.filter_by(email=email).first()
-        if user and check_password(user.password, password):
-            session.update({
-                "user_id": user.id,
-                "email": user.email,
-                "role": "user"
-            })
-            db.session.add(UserLog(email=email, action="Logged in"))
-            db.session.commit()
-            return redirect(url_for("user.home", user_id=user.id))
+        if users_col.find_one({"email": email}):
+            flash("Email already exists")
+            return redirect(url_for("users.signup"))
 
-        flash("Invalid credentials", "danger")
+        image = request.files.get("passport")
+        upload = cloudinary.uploader.upload(image) if image else None
+
+        user = {
+            "_id": str(uuid.uuid4()),
+            "name": request.form["name"],
+            "email": email,
+            "password": generate_password_hash(request.form["password"]),
+            "passport_url": upload["secure_url"] if upload else None,
+            "approved": False,
+            "created_at": datetime.utcnow()
+        }
+
+        users_col.insert_one(user)
+        flash("Signup successful. Await approval.")
+        return redirect(url_for("users.login"))
+
+    return render_template("signup.html")
+
+
+@users_bp.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        user = users_col.find_one({"email": request.form["email"]})
+
+        if not user or not check_password_hash(user["password"], request.form["password"]):
+            flash("Invalid credentials")
+            return redirect(url_for("users.login"))
+
+        if not user["approved"]:
+            flash("Account not approved yet")
+            return redirect(url_for("users.login"))
+
+        session["user_id"] = user["_id"]
+        return redirect(url_for("users.dashboard"))
+
     return render_template("login.html")
 
 
-@user_bp.route("/home/<int:user_id>")
-@role_required("user")
-def home(user_id):
-    user = User.query.get_or_404(user_id)
-    return render_template("home.html", user=user)
+@users_bp.route("/dashboard")
+def dashboard():
+    if "user_id" not in session:
+        return redirect(url_for("users.login"))
+    return render_template("user_dashboard.html")
 
 
-@user_bp.route('/passport/<int:user_id>')
-def user_passport(user_id):
-    user = User.query.get_or_404(user_id)
-    if user.passport:
-        return send_file(io.BytesIO(user.passport), mimetype="image/jpeg")
-    return "", 404
-
-
-@user_bp.route('/logout')
+@users_bp.route("/logout")
 def logout():
     session.clear()
-    flash("Logged out", "info")
-    return redirect(url_for("user.homePage"))
+    return redirect(url_for("users.login"))

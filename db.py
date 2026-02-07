@@ -1,19 +1,18 @@
 import os
-from flask_sqlalchemy import SQLAlchemy
+from pymongo import MongoClient
+import cloudinary
+import cloudinary.uploader
 
-db = SQLAlchemy()
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client.udms
 
-def init_db(app):
-    database_url = os.getenv("DATABASE_URL")
+users_col = db.users
+admins_col = db.admins
+superadmins_col = db.superadmins
+otp_logs_col = db.otp_logs
 
-    if not database_url:
-        raise RuntimeError("DATABASE_URL not set")
-
-    # Render provides postgres:// but SQLAlchemy expects postgresql://
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    db.init_app(app)
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)

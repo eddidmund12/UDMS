@@ -5,45 +5,30 @@ from models import User, Admin, AdminLog
 from utils import role_required, hash_password, check_password, data_validation, process_image, generate_otp, send_otp_email
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+from flask import Blueprint, render_template, redirect, url_for, session
+from db import users_col, admins_col
 
-@admin_bp.route("/login", methods=["GET", "POST"])
-def admin_logon():
-    if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
+admin_bp = Blueprint("admin", __name__)
 
-        admin = Admin.query.filter_by(email=email).first()
-        if admin and check_password(admin.password, password):
-            if not admin.is_approved:
-                flash("Account pending approval", "warning")
-                return render_template("admin_login.html")
-
-            session.update({
-                "user_id": admin.id,
-                "email": admin.email,
-                "role": "admin"
-            })
-            db.session.add(AdminLog(email=email, action="Logged in"))
-            db.session.commit()
-            return redirect(url_for("admin.admin_dashboard"))
-
-        flash("Invalid credentials", "danger")
+@admin_bp.route("/admin/login")
+def admin_login():
     return render_template("admin_login.html")
 
 
-@admin_bp.route("/dashboard")
-@role_required("admin")
+@admin_bp.route("/admin/dashboard")
 def admin_dashboard():
-    user_count = User.query.count()
-    return render_template("admin_dashboard.html", user_count=user_count)
+    if "admin_id" not in session:
+        return redirect(url_for("admin.admin_login"))
+
+    pending_users = users_col.find({"approved": False})
+    return render_template("admin_dashboard.html", users=pending_users)
 
 
-@admin_bp.route("/passport/<int:admin_id>")
-def admin_passport(admin_id):
-    admin = Admin.query.get_or_404(admin_id)
-    if admin.passport:
-        return send_file(io.BytesIO(admin.passport), mimetype="image/jpeg")
-    return "", 404
+@admin_bp.route("/admin/approve/<user_id>")
+def approve_user(user_id):
+    users_col.update_one({"_id": user_id}, {"$set": {"approved": True}})
+    return redirect(url_for("admin.admin_dashboard"))
+
 
 
 @admin_bp.route("/logout")

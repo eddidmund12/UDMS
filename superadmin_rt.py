@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, flash, url_for, session
-from db import db
+from db import admins_col, users_col
 from models import User, Admin, SuperAdmin, UserLog, AdminLog
 from utils import role_required, data_validation, hash_password, check_password
 

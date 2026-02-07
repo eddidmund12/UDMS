@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # 🔐 Security
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
+app.secret_key = os.getenv("SECRET_KEY")
 
 # 🐘 Database (PostgreSQL on Render, SQLite locally)
 database_url = os.environ.get("DATABASE_URL")
