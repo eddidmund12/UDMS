@@ -6,7 +6,7 @@ Pillow>=9.5,<11
 gunicorn>=21,<23
 psycopg2-binary>=2.9
 pymongo>=4.4,<5
-dnspyton>=0.1,<0.2
+dnspython>=0.1,<0.2
 cloudinary>=1.30,<2
 python-dotenv>=0.19,<0.21
 
